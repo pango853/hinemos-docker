@@ -1,0 +1,72 @@
+# 1. Install and get files with CentOS 7
+FROM centos:7.7.1908 AS install-env
+LABEL maintainer="Pango Chan <Pango853@gmail.com>"
+
+ARG LANGUAGE=en
+
+# Install dependencies
+RUN yum install -y vim-common
+# Install package
+RUN LANGUAGE=${LANGUAGE} rpm -ivh https://github.com/hinemos/hinemos/releases/download/v6.2.2/hinemos-6.2-manager-6.2.2-1.el7.x86_64.rpm
+
+
+## Build runtime with OpenJDK 8
+FROM openjdk:8-jdk
+LABEL maintainer="Pango Chan <Pango853@gmail.com>"
+
+ENV LANGUAGE=${LANGUAGE}
+ENV STARTUP_MODE=NORMAL
+ENV DB_HOST=db
+ENV DB_PORT=24001
+
+WORKDIR /opt
+COPY --from=install-env /opt/hinemos hinemos
+
+ENTRYPOINT ["/usr/local/openjdk-8/bin/java", \
+ "-Djavax.persistence.jdbc.url=jdbc:postgresql://${DB_HOST}:${DB_PORT}/hinemos?loginTimeout=30&amp;socketTimeout=3600&amp;tcpKeepAlive=true&amp;ApplicationName=hinemos", \
+ "-Djdk.xml.entityExpansionLimit=0", \
+ "-javaagent:/opt/hinemos/lib/eclipselink.jar", \
+ "-Dsun.net.inetaddr.ttl=0", \
+ "-Dsun.net.inetaddr.negative.ttl=1", \
+ "-XX:-OmitStackTraceInFastThrow", \
+ "-Djava.security.egd=file:/dev/./urandom", \
+ "-server", \
+ "-Dprogram.name=hinemos_manager", \
+ "-Dhinemos.manager.hostname=$(hostname)", \
+ "-Dhinemos.manager.home.dir=/opt/hinemos", \
+ "-Dhinemos.manager.etc.dir=/opt/hinemos/etc", \
+ "-Dhinemos.manager.log.dir=/opt/hinemos/var/log", \
+ "-Xms256m", \
+ "-Xmx256m", \
+ "-XX:NewSize=80m", \
+ "-XX:MaxNewSize=80m", \
+ "-Xss256k", \
+ "-XX:CMSInitiatingOccupancyFraction=75", \
+ "-XX:+UseCMSInitiatingOccupancyOnly", \
+ "-XX:+UseConcMarkSweepGC", \
+ "-XX:+CMSParallelRemarkEnabled", \
+ "-XX:+UseParNewGC", \
+ "-XX:+DisableExplicitGC", \
+ "-XX:SurvivorRatio=3", \
+ "-XX:MaxTenuringThreshold=15", \
+ "-XX:TargetSurvivorRatio=90", \
+ "-Xloggc:/opt/hinemos/var/log/gc.log", \
+ "-XX:+UseGCLogFileRotation", \
+ "-XX:NumberOfGCLogFiles=5", \
+ "-XX:GCLogFileSize=20M", \
+ "-verbose:gc", \
+ "-XX:+PrintGCDetails", \
+ "-XX:+PrintGCDateStamps", \
+ "-XX:+PrintClassHistogram", \
+ "-Dcom.sun.management.jmxremote", \
+ "-Dcom.sun.management.jmxremote.port=7100", \
+ "-Dcom.sun.management.jmxremote.ssl=false", \
+ "-Dcom.sun.management.jmxremote.authenticate=true", \
+ "-Dcom.sun.management.jmxremote.password.file=/opt/hinemos/etc/jmxremote.password", \
+ "-Dcom.sun.management.jmxremote.access.file=/opt/hinemos/etc/jmxremote.access", \
+ "-XX:+HeapDumpOnOutOfMemoryError", \
+ "-XX:HeapDumpPath=/opt/hinemos/var/log", \
+ "-cp", \
+ "/opt/hinemos/etc:/opt/hinemos/lib:/opt/hinemos/lib/commons-codec-1.10.jar:/opt/hinemos/lib/commons-logging-1.2.jar:/opt/hinemos/lib/commons-math3-3.6.1.jar:/opt/hinemos/lib/commons-net-3.5.jar:/opt/hinemos/lib/eclipselink.jar:/opt/hinemos/lib/HinemosCommon.jar:/opt/hinemos/lib/HinemosManager.jar:/opt/hinemos/lib/HinemosManagerRhel.jar:/opt/hinemos/lib/HinemosReporting.jar:/opt/hinemos/lib/HinemosReportingRhel.jar:/opt/hinemos/lib/httpclient-4.5.2.jar:/opt/hinemos/lib/httpclient-cache-4.5.2.jar:/opt/hinemos/lib/httpcore-4.4.5.jar:/opt/hinemos/lib/httpmime-4.5.2.jar:/opt/hinemos/lib/intel-wsman-1.0.1-mod.jar:/opt/hinemos/lib/jackson-annotations-2.8.0.jar:/opt/hinemos/lib/jackson-core-2.8.2.jar:/opt/hinemos/lib/jackson-databind-2.8.2.jar:/opt/hinemos/lib/javax.mail-1.5.5.jar:/opt/hinemos/lib/javax.persistence_2.1.1.v201509150925.jar:/opt/hinemos/lib/joda-time-2.9.1.jar:/opt/hinemos/lib/jpasecurity-core-0.4.0.jar:/opt/hinemos/lib/jsch-0.1.53.jar:/opt/hinemos/lib/log4j-1.2.17.jar:/opt/hinemos/lib/mssql-jdbc-6.2.2.jre8.jar:/opt/hinemos/lib/postgresql-9.4.1209.jar:/opt/hinemos/lib/Publish.jar:/opt/hinemos/lib/sblim-cim-client-1.3.9.3.jar:/opt/hinemos/lib/snmp4j-2.3.1.jar", \
+ "com.clustercontrol.HinemosManagerMain"]
+
