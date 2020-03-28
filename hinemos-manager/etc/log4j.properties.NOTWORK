@@ -1,0 +1,15 @@
+#
+# Hinemos Logging Configuration
+#
+
+log4j.rootCategory=INFO, console
+log4j.additivity.HinemosInternal=false
+
+log4j.category.com.clustercontrol.HinemosManagerMain=INFO, console
+log4j.category.HinemosOperation=INFO, console
+log4j.category.HinemosInternal=INFO, console
+# log4j.category.com.clustercontrol.dummy=debug
+
+log4j.appender.console=org.apache.log4j.ConsoleAppender
+log4j.appender.console.layout=org.apache.log4j.PatternLayout
+

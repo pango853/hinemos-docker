@@ -1,0 +1,38 @@
+#
+# Hinemos Logging Configuration
+#
+
+log4j.rootCategory=info, manager
+log4j.additivity.HinemosInternal=false
+
+log4j.category.com.clustercontrol.HinemosManagerMain=info, boot
+log4j.category.HinemosOperation=info, operation
+log4j.category.HinemosInternal=info, internal
+# log4j.category.com.clustercontrol.dummy=debug
+
+log4j.appender.boot=org.apache.log4j.FileAppender
+log4j.appender.boot.File=${hinemos.manager.log.dir}/boot.log
+log4j.appender.boot.Append=true
+log4j.appender.boot.layout=org.apache.log4j.PatternLayout
+log4j.appender.boot.layout.ConversionPattern=%d %-5p [%c] (%t) %m%n
+
+log4j.appender.manager=org.apache.log4j.DailyRollingFileAppender
+log4j.appender.manager.File=${hinemos.manager.log.dir}/hinemos_manager.log
+log4j.appender.manager.Append=true
+log4j.appender.manager.DatePattern='.'yyyy-MM-dd
+log4j.appender.manager.layout=org.apache.log4j.PatternLayout
+log4j.appender.manager.layout.ConversionPattern=%d %-5p [%c] (%t) %m%n
+
+log4j.appender.operation=org.apache.log4j.DailyRollingFileAppender
+log4j.appender.operation.File=${hinemos.manager.log.dir}/hinemos_operation.log
+log4j.appender.operation.Append=true
+log4j.appender.operation.DatePattern='.'yyyy-MM-dd
+log4j.appender.operation.layout=org.apache.log4j.PatternLayout
+log4j.appender.operation.layout.ConversionPattern=%d %-5p [%c] (%t) %m%n
+
+log4j.appender.internal=org.apache.log4j.DailyRollingFileAppender
+log4j.appender.internal.File=${hinemos.manager.log.dir}/hinemos_internal.log
+log4j.appender.internal.Append=true
+log4j.appender.internal.DatePattern='.'yyyy-MM-dd
+log4j.appender.internal.layout=org.apache.log4j.PatternLayout
+log4j.appender.internal.layout.ConversionPattern=%d %-5p [%c] (%t) %m%n

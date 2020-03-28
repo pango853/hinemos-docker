@@ -13,8 +13,11 @@ RUN sed -iBAK 's/<\(.\+"javax.persistence.jdbc.url".\+\)>/<!-- \1 -->/' /opt/hin
 
 
 ## Build runtime with OpenJDK 8
-FROM openjdk:8-jdk
+#FROM openjdk:8-jdk
+FROM centos:7.7.1908
 LABEL maintainer="Pango Chan <Pango853@gmail.com>"
+
+RUN yum install -y java-1.8.0-openjdk-devel
 
 WORKDIR /opt
 COPY --from=install-env /opt/hinemos hinemos
@@ -25,7 +28,8 @@ ENV STARTUP_MODE=NORMAL
 ENV DB_HOST=db
 ENV DB_PORT=24001
 
-ENTRYPOINT ["sh", "-c", "/usr/local/openjdk-8/bin/java \
+#ENTRYPOINT ["sh", "-c", "/usr/local/openjdk-8/bin/java \
+ENTRYPOINT ["sh", "-c", "java \
  \"-Djavax.persistence.jdbc.url=jdbc:postgresql://${DB_HOST}:${DB_PORT}/hinemos?loginTimeout=30&amp;socketTimeout=3600&amp;tcpKeepAlive=true&amp;ApplicationName=hinemos\" \
  -Djdk.xml.entityExpansionLimit=0 \
  -javaagent:/opt/hinemos/lib/eclipselink.jar \
