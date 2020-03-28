@@ -41,6 +41,13 @@ docker run --rm -it -e DB_HOST=172.17.0.1 -p 8080:8080 -p 8081:8081 hinemos/hine
 Test it.
 > curl http://127.0.0.1:8080/HinemosWS/RepositoryEndpoint?wsdl
 
+## Hinemos Web Client
+
+```
+cd hinemos-web
+docker build -t hinemos/hinemos-web:6.2.2-alpha -f Dockerfile .
+docker run --rm -d -p 9090:80 hinemos/hinemos-web:6.2.2-alpha
+```
 
 # Disclaimer
 
