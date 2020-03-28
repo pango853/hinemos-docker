@@ -2,6 +2,7 @@
 # Agent
 cd hinemos-agent
 docker build -t hinemos/hinemos-agent:6.2.2-alpha -f Dockerfile .
+docker run --rm -it -p 24005:24005 hinemos/hinemos-agent:6.2.2-alpha
 
 # Hinemos Manager
 cd hinemos-db
