@@ -49,6 +49,55 @@ docker build -t hinemos/hinemos-web:6.2.2-alpha -f Dockerfile .
 docker run --rm -d -p 9090:80 hinemos/hinemos-web:6.2.2-alpha
 ```
 
+Test it.
+> curl http://127.0.0.1:9090/
+
+# Problems
+
+## syslog (TOACK)
+```
+[root@c4de27314ffa /]# rpm -ivh https://github.com/hinemos/hinemos/releases/download/v6.2.2/hinemos-6.2-agent-6.2.2-1.el.noarch.rpm
+Retrieving https://github.com/hinemos/hinemos/releases/download/v6.2.2/hinemos-6.2-agent-6.2.2-1.el.noarch.rpm
+Preparing...                          ################################# [100%]
+Updating / installing...
+   1:hinemos-6.2-agent-0:6.2.2-1.el   ################################# [100%]
+/etc/rsyslog.conf and /etc/syslog.conf are not found. Please edit System Logger configuration reffering the Manual
+```
+
+## No LOG!!! (TODO)
+```
+docker run --rm -it hinemos/hinemos-agent:6.2.2-alpha
+// Show nothing!!!
+```
+
+## Failed to init (RESOLVED)
+```
+[root@6bf582268c09 sbin]# cat ~/install.log.hinemos_manager
+Because environment variable LANG is ,
+the DB language is en.
+
+file systems mounted
+/dev/sda1 - /etc/hosts
+database directory(/opt/hinemos/var/data) will be in partition ( / ).
+file system contains log directory(/opt/hinemos/var/log) will be in partition ( / ).
+
+Configuring files (hinemos.cfg, postgresql.conf, persistence.xml, selfcheck-service.properties)...Change of /etc/snmp/snmpd.conf is not required.
+[OK]
+
+Changing the permissions of files...[OK]
+
+Initializing internal database...
+checking database directory(/opt/hinemos/var/data)... done
+checking current user(hinemos)... done
+initializing database directory(/opt/hinemos/var/data)... done
+...
+```
+
+CAUSE: LANGUAGE is empty
+       > su -c "${HINEMOS_HOME}/sbin/db_init/pg_init.sh ${LANGUAGE}" - ${HINEMOS_OS_USER} >> ~/install.log.hinemos_manager 2>&1
+SOLUTION: LANGUAGE rpm -ivh ...
+
+
 # Disclaimer
 
 Please feel free to use and enjoy. However I will not be responsible for any demage, cost or other liability, either directly or indirectly, caused by the use of this image and the relevant documents.
